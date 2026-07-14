@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Absence Detail - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Absence Record{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ absence.person.full_name }} - {{ absence.get_type_display }}</h1>
+  <div class="btn-row">
+    <a href="{% url 'absence:list' %}" class="btn btn-outline">&larr; Back to list</a>
+    {% if can_edit %}<a href="{% url 'absence:edit' absence.pk %}" class="btn">Edit</a>{% endif %}
+  </div>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <ul class="kv-list">
+    <li><span class="k">Person</span><span class="v"><a href="{% url 'personnel:detail' absence.person.pk %}">{{ absence.person.full_name }} ({{ absence.person.army_number }})</a></span></li>
+    <li><span class="k">Company</span><span class="v">{{ absence.person.company.name }}</span></li>
+    <li><span class="k">Type</span><span class="v">{{ absence.get_type_display }}</span></li>
+    <li><span class="k">From Date</span><span class="v">{{ absence.from_date }}</span></li>
+    <li><span class="k">To Date</span><span class="v">{{ absence.to_date }}</span></li>
+    <li><span class="k">Authority / Reference</span><span class="v">{{ absence.authority_reference }}</span></li>
+    <li><span class="k">Destination / Place</span><span class="v">{{ absence.destination|default:"-" }}</span></li>
+    <li><span class="k">Status</span><span class="v"><span class="badge badge-{{ absence.status_badge_class }}">{{ absence.get_status_display }}</span></span></li>
+    <li><span class="k">Remarks</span><span class="v">{{ absence.remarks|default:"-" }}</span></li>
+  </ul>
+  <p class="help-text" style="margin-top:12px;">
+    Created by {{ absence.created_by|default:"-" }} on {{ absence.created_at|date:"d M Y H:i" }}.<br>
+    Last updated by {{ absence.updated_by|default:"-" }} on {{ absence.updated_at|date:"d M Y H:i" }}.
+  </p>
+</div>
+{% endblock %}

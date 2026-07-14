@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Duty - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}{% if object %}Edit{% else %}Add{% endif %} Duty Roster Entry{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{% if object %}Edit Duty Roster Entry{% else %}Add Duty Roster Entry{% endif %}</h1>
+</div>
+
+<div class="card">
+  <p class="help-text">Location/post must be a generic administrative description only (e.g. "Unit Lines", "Quarter Guard"). Do not enter operationally sensitive tasking or deployment detail.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="form-grid">
+      {% for field in form %}
+        <div class="form-group {% if field.name == 'remarks' or field.name == 'personnel_detailed' %}full-width{% endif %}">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}
+          {% for error in field.errors %}<div class="error-text">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="btn-row" style="margin-top:20px;">
+      <button type="submit" class="btn">Save</button>
+      <a href="{% if object %}{% url 'dutyroster:detail' object.pk %}{% else %}{% url 'dutyroster:list' %}{% endif %}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

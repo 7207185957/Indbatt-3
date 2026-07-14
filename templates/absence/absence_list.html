@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Leave / TD - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Leave / Temporary Duty / Absence{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Leave / TD / Absence Records</h1>
+    <p class="subtitle">Non-sensitive administrative absence tracking only.</p>
+  </div>
+  <div class="btn-row">
+    <a href="{% url 'absence:due_to_return' %}" class="btn btn-secondary">Due-to-Return List</a>
+    {% if can_edit %}<a href="{% url 'absence:add' %}" class="btn">+ Add Record</a>{% endif %}
+  </div>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="form-group">
+    <label>Search</label>
+    <input type="text" name="q" class="form-control" placeholder="Army no / name" value="{{ q }}">
+  </div>
+  <div class="form-group">
+    <label>Company</label>
+    <select name="company" class="form-select">
+      <option value="">All</option>
+      {% for c in companies %}<option value="{{ c.pk }}" {% if selected_company == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Type</label>
+    <select name="type" class="form-select">
+      <option value="">All</option>
+      {% for value, label in type_choices %}<option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Status</label>
+    <select name="status" class="form-select">
+      <option value="">All</option>
+      {% for value, label in status_choices %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label>From</label>
+    <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+  </div>
+  <div class="form-group">
+    <label>To</label>
+    <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+  </div>
+  <div class="form-group">
+    <label><input type="checkbox" name="currently_absent" value="1" class="form-check-input" {% if currently_absent %}checked{% endif %}> Currently absent only</label>
+  </div>
+  <div class="form-group"><button type="submit" class="btn btn-secondary">Filter</button></div>
+</form>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Name</th><th>Company</th><th>Type</th><th>From</th><th>To</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for a in absence_list %}
+      <tr>
+        <td><a href="{% url 'personnel:detail' a.person.pk %}">{{ a.person.full_name }}</a></td>
+        <td>{{ a.person.company.name }}</td>
+        <td>{{ a.get_type_display }}</td>
+        <td>{{ a.from_date }}</td>
+        <td>{{ a.to_date }}</td>
+        <td><span class="badge badge-{{ a.status_badge_class }}">{{ a.get_status_display }}</span></td>
+        <td><a href="{% url 'absence:detail' a.pk %}" class="btn btn-outline btn-sm">View</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="empty-state">No absence records found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

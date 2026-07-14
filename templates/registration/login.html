@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - {{ UNIT_NAME }}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box">
+      <h1>{{ UNIT_NAME }}</h1>
+      <p class="tagline">Internal LAN Administration Portal</p>
+
+      {% if form.errors %}
+        <div class="alert alert-error">Invalid username or password. Please try again.</div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_username" class="form-label">Username</label>
+          <input type="text" name="username" id="id_username" class="form-control" autofocus required>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label for="id_password" class="form-label">Password</label>
+          <input type="password" name="password" id="id_password" class="form-control" required>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn">Sign In</button>
+      </form>
+
+      <p class="login-notice">
+        Each account is individually issued. Do not share credentials.<br>
+        For non-classified unit administration use only.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

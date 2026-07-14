@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Reports - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Reports</h1>
+</div>
+
+<div class="stat-grid">
+  <a class="card" href="{% url 'reports:personnel' %}">
+    <h2>Personnel List Report</h2>
+    <p class="text-muted">Full personnel master list with current filters, exportable to CSV.</p>
+  </a>
+  <a class="card" href="{% url 'reports:strength' %}">
+    <h2>Company-wise Strength Report</h2>
+    <p class="text-muted">Daily strength returns by company/date range.</p>
+  </a>
+  <a class="card" href="{% url 'reports:absence' %}">
+    <h2>Absence / Leave Report</h2>
+    <p class="text-muted">Leave, TD, course, hospital and attachment records.</p>
+  </a>
+  <a class="card" href="{% url 'reports:duty' %}">
+    <h2>Duty Roster Report</h2>
+    <p class="text-muted">Duty roster entries by date/company/type.</p>
+  </a>
+  <a class="card" href="{% url 'reports:due_to_return' %}">
+    <h2>Due-to-Return Report</h2>
+    <p class="text-muted">Personnel returning from absence within a chosen window.</p>
+  </a>
+</div>
+{% endblock %}

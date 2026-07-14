@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Access Denied - {{ UNIT_NAME|default:"Unit Administration System" }}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box">
+      <h1>Access Denied</h1>
+      <p class="tagline">You do not have permission to view this page or perform this action.</p>
+      <a href="{% url 'dashboard:home' %}" class="btn">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

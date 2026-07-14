@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Duty Detail - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Duty Roster Detail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ duty.duty_type }} - {{ duty.duty_date }}</h1>
+  <div class="btn-row">
+    <a href="{% url 'dutyroster:list' %}" class="btn btn-outline">&larr; Back to list</a>
+    {% if can_edit %}<a href="{% url 'dutyroster:edit' duty.pk %}" class="btn">Edit</a>{% endif %}
+  </div>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <ul class="kv-list">
+    <li><span class="k">Duty Date</span><span class="v">{{ duty.duty_date }}</span></li>
+    <li><span class="k">Duty Type</span><span class="v">{{ duty.duty_type }}</span></li>
+    <li><span class="k">Company / Sub-unit</span><span class="v">{{ duty.company.name }}</span></li>
+    <li><span class="k">Location / Post</span><span class="v">{{ duty.duty_location }}</span></li>
+    <li><span class="k">Shift / Time</span><span class="v">{{ duty.shift_time }}</span></li>
+    <li><span class="k">Status</span><span class="v"><span class="badge badge-{{ duty.status_badge_class }}">{{ duty.get_status_display }}</span></span></li>
+    <li><span class="k">Remarks</span><span class="v">{{ duty.remarks|default:"-" }}</span></li>
+  </ul>
+
+  <h3 class="section-title">Personnel Detailed</h3>
+  <ul class="kv-list">
+    {% for p in duty.personnel_detailed.all %}
+      <li><span class="k"><a href="{% url 'personnel:detail' p.pk %}">{{ p.rank }} {{ p.full_name }}</a></span><span class="v">{{ p.army_number }}</span></li>
+    {% empty %}
+      <li class="empty-state">No personnel detailed.</li>
+    {% endfor %}
+  </ul>
+
+  <p class="help-text" style="margin-top:12px;">
+    Created by {{ duty.created_by|default:"-" }} on {{ duty.created_at|date:"d M Y H:i" }}.<br>
+    Last updated by {{ duty.updated_by|default:"-" }} on {{ duty.updated_at|date:"d M Y H:i" }}.
+  </p>
+</div>
+{% endblock %}
