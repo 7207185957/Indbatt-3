@@ -6,21 +6,24 @@ from .models import User
 
 @admin.register(User)
 class UnitUserAdmin(UserAdmin):
-    """
-    Admin registration for the custom User model. Super Admins manage
-    individual accounts here, including role and company assignment.
-    """
+    """Admin registration for individually attributable user accounts."""
 
     fieldsets = UserAdmin.fieldsets + (
         ('Unit Administration System', {
-            'fields': ('role', 'company', 'rank', 'service_number', 'contact_number', 'is_active_account'),
+            'fields': (
+                'role', 'company', 'rank', 'appointment', 'service_number',
+                'contact_number', 'profile_photo',
+            ),
         }),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('Unit Administration System', {
-            'fields': ('role', 'company', 'rank', 'service_number', 'contact_number'),
+            'fields': (
+                'role', 'company', 'rank', 'appointment', 'service_number',
+                'contact_number', 'profile_photo',
+            ),
         }),
     )
-    list_display = ('username', 'get_full_name', 'role', 'company', 'is_active', 'is_staff')
+    list_display = ('username', 'get_full_name', 'rank', 'appointment', 'role', 'company', 'is_active', 'is_staff')
     list_filter = ('role', 'company', 'is_active', 'is_staff')
-    search_fields = ('username', 'first_name', 'last_name', 'service_number')
+    search_fields = ('username', 'first_name', 'last_name', 'service_number', 'appointment')
