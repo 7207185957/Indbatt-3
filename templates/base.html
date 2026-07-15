@@ -10,78 +10,83 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body data-theme="command">
-<div class="app-shell">
-  <aside class="sidebar">
+<div class="app-shell" id="appShell">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      {{ UNIT_NAME }}
-      <small>One Team, One Mission</small>
+      <button class="icon-button sidebar-toggle-button" id="sidebarToggle" aria-label="Collapse navigation">☰</button>
+      <div class="brand-mark">★</div>
+      <div class="brand-copy"><strong>{{ UNIT_NAME }}</strong><small>One Team, One Mission</small></div>
     </div>
     <ul class="sidebar-nav">
-      <li><a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">⌂ Dashboard</a></li>
-      <li><a href="{% url 'personnel:list' %}" class="{% if request.resolver_match.app_name == 'personnel' %}active{% endif %}">♟ Manpower</a></li>
-      <li><a href="{% url 'absence:list' %}" class="{% if request.resolver_match.app_name == 'absence' %}active{% endif %}">◷ Leave / TD</a></li>
-      <li><a href="{% url 'strength:list' %}" class="{% if request.resolver_match.app_name == 'strength' %}active{% endif %}">▥ Daily Strength</a></li>
-      <li><a href="{% url 'dutyroster:list' %}" class="{% if request.resolver_match.app_name == 'dutyroster' %}active{% endif %}">✓ Duty Roster</a></li>
-      <li><a href="{% url 'reports:home' %}" class="{% if request.resolver_match.app_name == 'reports' %}active{% endif %}">▤ Reports & Analytics</a></li>
+      <li><a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span><span class="nav-label">Dashboard</span></a></li>
+      <li><a href="{% url 'personnel:list' %}" class="{% if request.resolver_match.app_name == 'personnel' %}active{% endif %}"><span class="nav-icon">♟</span><span class="nav-label">Manpower</span></a></li>
+      <li><a href="{% url 'absence:list' %}" class="{% if request.resolver_match.app_name == 'absence' %}active{% endif %}"><span class="nav-icon">◷</span><span class="nav-label">Leave / TD</span></a></li>
+      <li><a href="{% url 'strength:list' %}" class="{% if request.resolver_match.app_name == 'strength' %}active{% endif %}"><span class="nav-icon">▥</span><span class="nav-label">Daily Strength</span></a></li>
+      <li><a href="{% url 'dutyroster:list' %}" class="{% if request.resolver_match.app_name == 'dutyroster' %}active{% endif %}"><span class="nav-icon">✓</span><span class="nav-label">Duty Roster</span></a></li>
+      <li><a href="{% url 'reports:home' %}" class="{% if request.resolver_match.app_name == 'reports' %}active{% endif %}"><span class="nav-icon">▤</span><span class="nav-label">Reports & Analytics</span></a></li>
       {% if is_super_admin_user %}
-        <li><a href="{% url 'accounts:user_list' %}" class="{% if request.resolver_match.app_name == 'accounts' %}active{% endif %}">♙ Users</a></li>
-        <li><a href="{% url 'admin:index' %}">⚙ System Admin</a></li>
+        <li><a href="{% url 'accounts:user_list' %}" class="{% if request.resolver_match.app_name == 'accounts' %}active{% endif %}"><span class="nav-icon">♙</span><span class="nav-label">Users</span></a></li>
+        <li><a href="{% url 'admin:index' %}"><span class="nav-icon">⚙</span><span class="nav-label">System Admin</span></a></li>
       {% endif %}
     </ul>
-    <div class="sidebar-footer">
-      <span class="status-dot"></span>LAN service<br>
-      Non-classified administration only
-    </div>
+    <div class="sidebar-footer"><span class="status-dot"></span><span class="nav-label">LAN service online<br>Non-classified administration only</span></div>
   </aside>
 
   <div class="main-col">
     <header class="topbar">
-      <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      <div class="topbar-left">
+        <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      </div>
       <div class="topbar-user">
         {% if user.is_authenticated %}
           <select id="themePicker" class="theme-picker" aria-label="Theme">
             <option value="command">Command Green</option>
+            <option value="navy">Command Navy</option>
             <option value="standard">Standard Light</option>
+            <option value="contrast">High Contrast</option>
           </select>
-          <div class="branch-profile">
+          <button class="icon-button notification-button" id="notificationButton" aria-label="Open notifications">🔔<span class="notification-badge">3</span></button>
+          <button class="branch-profile profile-button" id="profileButton" aria-label="Open profile">
             <div class="branch-avatar">{{ user.first_name|first|default:user.username|first|upper }}</div>
-            <div>
-              <strong>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</strong>
-              <small>{{ user.company.name|default:user.get_role_display }}</small>
-            </div>
-          </div>
-          <a href="{% url 'accounts:my_password' %}" class="btn btn-outline btn-sm">Password</a>
-          <form action="{% url 'logout' %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
-          </form>
+            <div><strong>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</strong><small>{{ user.company.name|default:user.get_role_display }}</small></div>
+          </button>
         {% endif %}
       </div>
     </header>
 
     <main class="content">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+      {% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}{% endif %}
       {% block content %}{% endblock %}
     </main>
   </div>
 </div>
-<script>
-(function () {
-  const picker = document.getElementById('themePicker');
-  const saved = localStorage.getItem('unitAdminTheme') || 'command';
-  document.body.dataset.theme = saved;
-  if (picker) {
-    picker.value = saved;
-    picker.addEventListener('change', function () {
-      document.body.dataset.theme = this.value;
-      localStorage.setItem('unitAdminTheme', this.value);
-    });
-  }
-})();
-</script>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="side-drawer" id="notificationDrawer" aria-hidden="true">
+  <div class="drawer-header"><div><small>Command Centre</small><h2>Notifications</h2></div><button class="icon-button drawer-close" data-close-drawer>×</button></div>
+  <div class="drawer-body">
+    <a class="notification-item priority" href="{% url 'strength:list' %}"><span>!</span><div><strong>Daily strength review</strong><small>Verify all company returns before close of work.</small></div></a>
+    <a class="notification-item" href="{% url 'absence:due_to_return' %}"><span>↩</span><div><strong>Upcoming returns</strong><small>Review personnel due to return from leave or TD.</small></div></a>
+    <a class="notification-item" href="{% url 'dutyroster:upcoming' %}"><span>✓</span><div><strong>Upcoming duties</strong><small>Confirm administrative duty assignments.</small></div></a>
+  </div>
+</aside>
+
+<aside class="side-drawer" id="profileDrawer" aria-hidden="true">
+  <div class="drawer-header"><div><small>Logged-in account</small><h2>Profile</h2></div><button class="icon-button drawer-close" data-close-drawer>×</button></div>
+  <div class="drawer-body profile-drawer-body">
+    <div class="profile-hero"><div class="branch-avatar profile-large">{{ user.first_name|first|default:user.username|first|upper }}</div><h3>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</h3><p>{{ user.get_role_display }}</p></div>
+    <ul class="kv-list">
+      <li><span class="k">Branch / Company</span><span class="v">{{ user.company.name|default:"Unit-wide" }}</span></li>
+      <li><span class="k">Service Number</span><span class="v">{{ user.service_number|default:"Not entered" }}</span></li>
+      <li><span class="k">Username</span><span class="v">{{ user.username }}</span></li>
+    </ul>
+    <div class="drawer-actions">
+      <a href="{% url 'accounts:my_password' %}" class="btn">Change Password</a>
+      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit" class="btn btn-danger">Logout</button></form>
+    </div>
+  </div>
+</aside>
+
+<script src="{% static 'js/command-dashboard.js' %}"></script>
 </body>
 </html>
