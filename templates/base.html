@@ -7,6 +7,7 @@
   <title>{% block title %}{{ UNIT_NAME }}{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/command-theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dense-dashboard.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
 <body data-theme="command">
@@ -34,59 +35,25 @@
 
   <div class="main-col">
     <header class="topbar">
-      <div class="topbar-left">
-        <div class="topbar-title">{% block page_title %}{% endblock %}</div>
-      </div>
+      <div class="topbar-left"><div class="topbar-title">{% block page_title %}{% endblock %}</div></div>
       <div class="topbar-user">
         {% if user.is_authenticated %}
-          <select id="themePicker" class="theme-picker" aria-label="Theme">
-            <option value="command">Command Green</option>
-            <option value="navy">Command Navy</option>
-            <option value="standard">Standard Light</option>
-            <option value="contrast">High Contrast</option>
-          </select>
-          <button class="icon-button notification-button" id="notificationButton" aria-label="Open notifications">🔔<span class="notification-badge">3</span></button>
-          <button class="branch-profile profile-button" id="profileButton" aria-label="Open profile">
-            <div class="branch-avatar">{{ user.first_name|first|default:user.username|first|upper }}</div>
-            <div><strong>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</strong><small>{{ user.company.name|default:user.get_role_display }}</small></div>
+          <span id="liveClock" class="live-clock"></span>
+          <select id="themePicker" class="theme-picker" aria-label="Theme"><option value="command">Command Green</option><option value="navy">Command Navy</option><option value="standard">Standard Light</option><option value="contrast">High Contrast</option></select>
+          <button class="icon-button notification-button" data-panel-target="notificationDrawer" aria-label="Open notifications">🔔<span class="notification-badge">3</span></button>
+          <button class="branch-profile profile-button" data-panel-target="profileDrawer" aria-label="Open profile">
+            {% if user.profile_photo %}<img class="profile-photo" src="{{ user.profile_photo.url }}" alt="Profile photo">{% else %}<div class="branch-avatar">{{ user.first_name|first|default:user.username|first|upper }}</div>{% endif %}
+            <div><strong>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</strong><small>{% if user.appointment %}{{ user.appointment }}{% elif user.company %}{{ user.company.name }}{% else %}{{ user.get_role_display }}{% endif %}</small></div>
           </button>
         {% endif %}
       </div>
     </header>
-
-    <main class="content">
-      {% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}{% endif %}
-      {% block content %}{% endblock %}
-    </main>
+    <main class="content">{% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}{% endif %}{% block content %}{% endblock %}</main>
   </div>
 </div>
 
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
-<aside class="side-drawer" id="notificationDrawer" aria-hidden="true">
-  <div class="drawer-header"><div><small>Command Centre</small><h2>Notifications</h2></div><button class="icon-button drawer-close" data-close-drawer>×</button></div>
-  <div class="drawer-body">
-    <a class="notification-item priority" href="{% url 'strength:list' %}"><span>!</span><div><strong>Daily strength review</strong><small>Verify all company returns before close of work.</small></div></a>
-    <a class="notification-item" href="{% url 'absence:due_to_return' %}"><span>↩</span><div><strong>Upcoming returns</strong><small>Review personnel due to return from leave or TD.</small></div></a>
-    <a class="notification-item" href="{% url 'dutyroster:upcoming' %}"><span>✓</span><div><strong>Upcoming duties</strong><small>Confirm administrative duty assignments.</small></div></a>
-  </div>
-</aside>
-
-<aside class="side-drawer" id="profileDrawer" aria-hidden="true">
-  <div class="drawer-header"><div><small>Logged-in account</small><h2>Profile</h2></div><button class="icon-button drawer-close" data-close-drawer>×</button></div>
-  <div class="drawer-body profile-drawer-body">
-    <div class="profile-hero"><div class="branch-avatar profile-large">{{ user.first_name|first|default:user.username|first|upper }}</div><h3>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</h3><p>{{ user.get_role_display }}</p></div>
-    <ul class="kv-list">
-      <li><span class="k">Branch / Company</span><span class="v">{{ user.company.name|default:"Unit-wide" }}</span></li>
-      <li><span class="k">Service Number</span><span class="v">{{ user.service_number|default:"Not entered" }}</span></li>
-      <li><span class="k">Username</span><span class="v">{{ user.username }}</span></li>
-    </ul>
-    <div class="drawer-actions">
-      <a href="{% url 'accounts:my_password' %}" class="btn">Change Password</a>
-      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit" class="btn btn-danger">Logout</button></form>
-    </div>
-  </div>
-</aside>
-
+<aside class="side-drawer floating-panel" id="notificationDrawer"><div class="drawer-header"><div><small>Command Centre</small><h2>Notifications</h2></div></div><div class="drawer-body"><a class="notification-item priority" href="{% url 'strength:list' %}"><span>!</span><div><strong>Daily strength review</strong><small>Verify pending returns.</small></div></a><a class="notification-item" href="{% url 'absence:due_to_return' %}"><span>↩</span><div><strong>Upcoming returns</strong><small>Review due personnel.</small></div></a><a class="notification-item" href="{% url 'dutyroster:upcoming' %}"><span>✓</span><div><strong>Upcoming duties</strong><small>Confirm assignments.</small></div></a></div></aside>
+<aside class="side-drawer floating-panel" id="profileDrawer"><div class="drawer-header"><div><small>Logged-in account</small><h2>Profile</h2></div></div><div class="drawer-body profile-drawer-body"><div class="profile-hero">{% if user.profile_photo %}<img class="profile-photo profile-large" src="{{ user.profile_photo.url }}" alt="Profile photo">{% else %}<div class="branch-avatar profile-large">{{ user.first_name|first|default:user.username|first|upper }}</div>{% endif %}<h3>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</h3><p>{{ user.get_role_display }}</p></div><ul class="kv-list"><li><span class="k">Branch / Company</span><span class="v">{% if user.company %}{{ user.company.name }}{% else %}Unit-wide{% endif %}</span></li><li><span class="k">Service Number</span><span class="v">{{ user.service_number|default:"Not entered" }}</span></li><li><span class="k">Username</span><span class="v">{{ user.username }}</span></li></ul><div class="drawer-actions"><a href="{% url 'accounts:my_password' %}" class="btn">Change Password</a><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit" class="btn btn-danger">Logout</button></form></div></div></aside>
 <script src="{% static 'js/command-dashboard.js' %}"></script>
 </body>
 </html>
