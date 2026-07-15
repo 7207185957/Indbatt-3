@@ -1,0 +1,197 @@
+:root {
+  --cmd-bg: #0b130f;
+  --cmd-panel: #132019;
+  --cmd-panel-2: #18281f;
+  --cmd-border: #314632;
+  --cmd-text: #eef5e9;
+  --cmd-muted: #9fb09d;
+  --cmd-green: #8dc63f;
+  --cmd-gold: #d6a437;
+  --cmd-red: #e35d5d;
+  --cmd-cyan: #57b9c7;
+}
+
+body[data-theme="command"] {
+  background: radial-gradient(circle at top right, #1c3024, var(--cmd-bg) 42%);
+  color: var(--cmd-text);
+}
+
+body[data-theme="command"] .sidebar {
+  background: linear-gradient(180deg, #101b14 0%, #0a110d 100%);
+  border-right: 1px solid var(--cmd-border);
+}
+
+body[data-theme="command"] .sidebar-brand {
+  background: linear-gradient(135deg, rgba(214,164,55,.16), rgba(141,198,63,.08));
+}
+
+body[data-theme="command"] .main-col,
+body[data-theme="command"] .content {
+  background: transparent;
+}
+
+body[data-theme="command"] .topbar {
+  background: rgba(13, 23, 17, .96);
+  border-bottom-color: var(--cmd-border);
+  color: var(--cmd-text);
+}
+
+body[data-theme="command"] .card,
+body[data-theme="command"] .stat-card,
+body[data-theme="command"] .filter-bar,
+body[data-theme="command"] .table-wrap {
+  background: linear-gradient(145deg, var(--cmd-panel), var(--cmd-panel-2));
+  border-color: var(--cmd-border);
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+}
+
+body[data-theme="command"] .stat-card {
+  border-left-width: 5px;
+}
+
+body[data-theme="command"] .stat-card .stat-value,
+body[data-theme="command"] h1,
+body[data-theme="command"] h2,
+body[data-theme="command"] h3,
+body[data-theme="command"] .topbar-title {
+  color: var(--cmd-text);
+}
+
+body[data-theme="command"] .stat-label,
+body[data-theme="command"] .subtitle,
+body[data-theme="command"] .text-muted,
+body[data-theme="command"] .help-text,
+body[data-theme="command"] .kv-list .k {
+  color: var(--cmd-muted) !important;
+}
+
+body[data-theme="command"] a { color: #b8dc75; }
+body[data-theme="command"] table.data-table th { background: #1b2b21; color: #dfead9; }
+body[data-theme="command"] table.data-table td,
+body[data-theme="command"] table.data-table th { border-bottom-color: var(--cmd-border); }
+body[data-theme="command"] table.data-table tbody tr:hover { background: rgba(141,198,63,.07); }
+
+body[data-theme="command"] .form-control,
+body[data-theme="command"] .form-select {
+  background: #0f1913;
+  color: var(--cmd-text);
+  border-color: var(--cmd-border);
+}
+
+.command-hero {
+  min-height: 170px;
+  border: 1px solid var(--cmd-border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  background:
+    linear-gradient(90deg, rgba(5,12,8,.94), rgba(11,21,14,.62)),
+    radial-gradient(circle at 80% 20%, rgba(214,164,55,.26), transparent 35%),
+    linear-gradient(135deg, #253925, #0c160f);
+  overflow: hidden;
+  position: relative;
+}
+
+.command-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(135deg, transparent 0 22px, rgba(255,255,255,.018) 22px 23px);
+  pointer-events: none;
+}
+
+.command-hero h1 { font-size: 2rem; margin: 0 0 8px; }
+.command-hero p { color: var(--cmd-muted); margin: 0; }
+.command-insignia {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 2px solid var(--cmd-gold);
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  background: rgba(0,0,0,.28);
+  box-shadow: 0 0 0 8px rgba(214,164,55,.06);
+}
+
+.announcement-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  border: 1px solid var(--cmd-border);
+  border-radius: 7px;
+  background: #101b14;
+  margin-bottom: 16px;
+  min-height: 38px;
+}
+.announcement-label {
+  flex: 0 0 auto;
+  padding: 10px 13px;
+  background: var(--cmd-gold);
+  color: #1b1608;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-size: .72rem;
+}
+.announcement-track {
+  white-space: nowrap;
+  display: inline-block;
+  padding-left: 100%;
+  animation: ticker 22s linear infinite;
+  color: #e5ecd9;
+}
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+.branch-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.branch-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--cmd-gold);
+  display: grid;
+  place-items: center;
+  background: #263a29;
+  color: white;
+  font-weight: 800;
+}
+.branch-profile small { display: block; color: var(--cmd-muted); margin-top: 3px; }
+
+.theme-picker {
+  border: 1px solid var(--cmd-border);
+  background: #172219;
+  color: var(--cmd-text);
+  border-radius: 5px;
+  padding: 5px 8px;
+  font-size: .78rem;
+}
+
+.dashboard-grid-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+  gap: 16px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 7px;
+  background: var(--cmd-green);
+}
+
+@media (max-width: 950px) {
+  .command-hero { grid-template-columns: 1fr; }
+  .command-insignia { display: none; }
+  .dashboard-grid-two { grid-template-columns: 1fr; }
+}
