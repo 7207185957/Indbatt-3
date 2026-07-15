@@ -4,67 +4,57 @@
 
 {% block content %}
 <section class="command-hero interactive-hero" id="heroBanner">
-  <div class="hero-copy">
-    <span class="eyebrow">Infantry Battalion Administration</span>
-    <h1>{{ UNIT_NAME }}</h1>
-    <p>Welcome, {% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}. {% if is_scoped %}Showing {{ user.company.name|default:"your assigned branch" }} data.{% else %}Showing the full unit administrative picture.{% endif %}</p>
-    <div class="hero-actions">
-      {% if can_edit %}<a href="{% url 'personnel:add' %}" class="btn">+ Add Personnel</a>{% endif %}
-      <a href="{% url 'reports:home' %}" class="btn btn-secondary">Open Analytics</a>
+  {% for slide in hero_slides %}
+  <div class="hero-slide {% if forloop.first %}active{% endif %}" {% if slide.image %}style="background-image:linear-gradient(90deg,rgba(5,12,8,.94),rgba(11,21,14,.42)),url('{{ slide.image.url }}');"{% endif %}>
+    <div class="hero-copy">
+      <span class="eyebrow">Infantry Battalion Administration</span>
+      <h1>{{ slide.title }}</h1>
+      <p>{{ slide.subtitle|default:"One Team, One Mission" }}</p>
+      <div class="hero-actions">{% if can_edit %}<a href="{% url 'personnel:add' %}" class="btn">+ Add Personnel</a>{% endif %}<a href="{% url 'reports:home' %}" class="btn btn-secondary">Open Analytics</a></div>
     </div>
   </div>
-  <div class="hero-visual" aria-hidden="true">
-    <div class="hero-ring ring-one"></div><div class="hero-ring ring-two"></div><div class="command-insignia">★</div>
+  {% empty %}
+  <div class="hero-slide active">
+    <div class="hero-copy">
+      <span class="eyebrow">Infantry Battalion Administration</span>
+      <h1>{{ UNIT_NAME }}</h1>
+      <p>Welcome, {% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}. {% if is_scoped %}Showing {{ user.company.name|default:"your assigned branch" }} data.{% else %}Showing the full unit administrative picture.{% endif %}</p>
+      <div class="hero-actions">{% if can_edit %}<a href="{% url 'personnel:add' %}" class="btn">+ Add Personnel</a>{% endif %}<a href="{% url 'reports:home' %}" class="btn btn-secondary">Open Analytics</a></div>
+    </div>
   </div>
-  <div class="hero-dots"><button class="hero-dot active" data-hero-slide="0"></button><button class="hero-dot" data-hero-slide="1"></button><button class="hero-dot" data-hero-slide="2"></button></div>
+  {% endfor %}
+  <div class="hero-visual" aria-hidden="true"><div class="hero-ring ring-one"></div><div class="hero-ring ring-two"></div><div class="command-insignia">★</div></div>
+  {% if hero_slides %}<div class="hero-dots">{% for slide in hero_slides %}<button class="hero-dot {% if forloop.first %}active{% endif %}" data-hero-slide="{{ forloop.counter0 }}"></button>{% endfor %}</div>{% endif %}
 </section>
 
-<div class="announcement-strip"><div class="announcement-label">Unit Scroll</div><div class="announcement-track">Daily strength returns are to be completed on time • Verify leave return dates • Review upcoming duties • Use only non-classified administrative information in this system</div><button class="ticker-pause" id="tickerPause" aria-label="Pause announcements">Ⅱ</button></div>
+<div class="announcement-strip">
+  <div class="announcement-label">Unit Scroll</div>
+  <div class="announcement-track">{% for item in announcements %}{{ item.message }}{% if not forloop.last %} • {% endif %}{% empty %}Daily strength returns are to be completed on time • Verify leave return dates • Review upcoming duties{% endfor %}</div>
+  <button class="ticker-pause" id="tickerPause" aria-label="Pause announcements">Ⅱ</button>
+</div>
 
-<section class="quick-actions-panel">
-  <div><span class="eyebrow">Quick Actions</span><h2>Common Tasks</h2></div>
-  <div class="quick-actions-grid">
-    {% if can_edit %}<a href="{% url 'personnel:add' %}" class="quick-action"><span>♟</span><strong>Add Personnel</strong><small>Create a new record</small></a>{% endif %}
-    {% if can_edit %}<a href="{% url 'absence:add' %}" class="quick-action"><span>◷</span><strong>Add Leave / TD</strong><small>Record an absence</small></a>{% endif %}
-    {% if can_edit %}<a href="{% url 'strength:add' %}" class="quick-action"><span>▥</span><strong>Enter Strength</strong><small>Submit daily return</small></a>{% endif %}
-    <a href="{% url 'reports:home' %}" class="quick-action"><span>▤</span><strong>View Reports</strong><small>Open analytics</small></a>
-  </div>
-</section>
+<section class="quick-actions-panel"><div><span class="eyebrow">Quick Actions</span><h2>Common Tasks</h2></div><div class="quick-actions-grid">
+{% if can_edit %}<a href="{% url 'personnel:add' %}" class="quick-action"><span>♟</span><strong>Add Personnel</strong><small>Create a new record</small></a><a href="{% url 'absence:add' %}" class="quick-action"><span>◷</span><strong>Add Leave / TD</strong><small>Record an absence</small></a><a href="{% url 'strength:add' %}" class="quick-action"><span>▥</span><strong>Enter Strength</strong><small>Submit daily return</small></a>{% endif %}<a href="{% url 'reports:home' %}" class="quick-action"><span>▤</span><strong>View Reports</strong><small>Open analytics</small></a>
+</div></section>
 
 <div class="stat-grid interactive-stats">
-  <a href="{% url 'personnel:list' %}?active=active" class="stat-card stat-link"><div class="stat-icon">♟</div><div><div class="stat-value count-up" data-count="{{ total_active }}">0</div><div class="stat-label">Total Strength</div></div><span class="stat-arrow">→</span></a>
-  <a href="{% url 'personnel:list' %}?status=PRESENT" class="stat-card stat-link accent-success"><div class="stat-icon">●</div><div><div class="stat-value count-up" data-count="{{ present_count }}">0</div><div class="stat-label">Present</div></div><span class="stat-arrow">→</span></a>
-  <a href="{% url 'personnel:list' %}?status=LEAVE" class="stat-card stat-link accent-warning"><div class="stat-icon">☀</div><div><div class="stat-value count-up" data-count="{{ leave_count }}">0</div><div class="stat-label">On Leave</div></div><span class="stat-arrow">→</span></a>
-  <a href="{% url 'personnel:list' %>?status=HOSPITAL" class="stat-card stat-link accent-danger"><div class="stat-icon">✚</div><div><div class="stat-value count-up" data-count="{{ absent_count }}">0</div><div class="stat-label">Total Absent</div></div><span class="stat-arrow">→</span></a>
-  <a href="{% url 'personnel:list' %}?status=TD" class="stat-card stat-link accent-info"><div class="stat-icon">↗</div><div><div class="stat-value count-up" data-count="{{ td_course_count }}">0</div><div class="stat-label">TD / Course</div></div><span class="stat-arrow">→</span></a>
-  <a href="{% url 'dutyroster:list' %}" class="stat-card stat-link accent-info"><div class="stat-icon">✓</div><div><div class="stat-value count-up" data-count="{{ today_duties|length }}">0</div><div class="stat-label">Today's Duties</div></div><span class="stat-arrow">→</span></a>
+<a href="{% url 'personnel:list' %}?active=active" class="stat-card stat-link"><div class="stat-icon">♟</div><div><div class="stat-value count-up" data-count="{{ total_active }}">0</div><div class="stat-label">Total Strength</div></div><span class="stat-arrow">→</span></a>
+<a href="{% url 'personnel:list' %}?status=PRESENT" class="stat-card stat-link accent-success"><div class="stat-icon">●</div><div><div class="stat-value count-up" data-count="{{ present_count }}">0</div><div class="stat-label">Present</div></div><span class="stat-arrow">→</span></a>
+<a href="{% url 'personnel:list' %}?status=LEAVE" class="stat-card stat-link accent-warning"><div class="stat-icon">☀</div><div><div class="stat-value count-up" data-count="{{ leave_count }}">0</div><div class="stat-label">On Leave</div></div><span class="stat-arrow">→</span></a>
+<a href="{% url 'personnel:list' %}?status=HOSPITAL" class="stat-card stat-link accent-danger"><div class="stat-icon">✚</div><div><div class="stat-value count-up" data-count="{{ absent_count }}">0</div><div class="stat-label">Total Absent</div></div><span class="stat-arrow">→</span></a>
+<a href="{% url 'personnel:list' %}?status=TD" class="stat-card stat-link accent-info"><div class="stat-icon">↗</div><div><div class="stat-value count-up" data-count="{{ td_course_count }}">0</div><div class="stat-label">TD / Course</div></div><span class="stat-arrow">→</span></a>
+<a href="{% url 'dutyroster:list' %}" class="stat-card stat-link accent-info"><div class="stat-icon">✓</div><div><div class="stat-value count-up" data-count="{{ today_duties|length }}">0</div><div class="stat-label">Today's Duties</div></div><span class="stat-arrow">→</span></a>
 </div>
 
 <div class="dashboard-grid-two analytics-row">
-  <section class="card chart-card">
-    <div class="card-heading"><div><span class="eyebrow">Live Summary</span><h2>Manpower Distribution</h2></div><a href="{% url 'reports:personnel' %}">Detailed report →</a></div>
-    <div class="donut-layout">
-      <div class="donut-chart" style="--present: {{ present_count }}; --leave: {{ leave_count }}; --other: {{ absent_count }}; --total: {{ total_active }};"><div class="donut-centre"><strong>{{ total_active }}</strong><small>Total</small></div></div>
-      <div class="chart-legend"><span><i class="legend-present"></i>Present <strong>{{ present_count }}</strong></span><span><i class="legend-leave"></i>Leave <strong>{{ leave_count }}</strong></span><span><i class="legend-other"></i>Other absence <strong>{{ absent_count }}</strong></span></div>
-    </div>
-  </section>
-
-  <section class="card branch-command-card">
-    <div class="card-heading"><div><span class="eyebrow">Current Login</span><h2>Branch Command</h2></div><button class="mini-action" id="openProfileFromCard">View profile</button></div>
-    <div class="branch-command-profile"><div class="branch-avatar profile-large">{{ user.first_name|first|default:user.username|first|upper }}</div><div><h3>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</h3><p>{{ user.company.name|default:user.get_role_display }}</p><span class="status-pill"><i></i>Active session</span></div></div>
-    <div class="profile-metrics"><div><small>Access</small><strong>{{ user.get_role_display }}</strong></div><div><small>Service No.</small><strong>{{ user.service_number|default:"Not entered" }}</strong></div><div><small>Date</small><strong>{{ today }}</strong></div></div>
-  </section>
+<section class="card chart-card"><div class="card-heading"><div><span class="eyebrow">Live Summary</span><h2>Manpower Distribution</h2></div><a href="{% url 'reports:personnel' %}">Detailed report →</a></div><div class="donut-layout"><div class="donut-chart" style="--present:{{ present_count }};--leave:{{ leave_count }};--other:{{ absent_count }};--total:{{ total_active }};"><div class="donut-centre"><strong>{{ total_active }}</strong><small>Total</small></div></div><div class="chart-legend"><span><i class="legend-present"></i>Present <strong>{{ present_count }}</strong></span><span><i class="legend-leave"></i>Leave <strong>{{ leave_count }}</strong></span><span><i class="legend-other"></i>Other absence <strong>{{ absent_count }}</strong></span></div></div></section>
+<section class="card branch-command-card"><div class="card-heading"><div><span class="eyebrow">Current Login</span><h2>Branch Command</h2></div></div><div class="branch-command-profile">{% if user.profile_photo %}<img class="profile-photo profile-large" src="{{ user.profile_photo.url }}" alt="Profile photo">{% else %}<div class="branch-avatar profile-large">{{ user.first_name|first|default:user.username|first|upper }}</div>{% endif %}<div><h3>{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</h3><p>{{ user.appointment|default:user.company.name|default:user.get_role_display }}</p><span class="status-pill"><i></i>Active session</span></div></div><div class="profile-metrics"><div><small>Access</small><strong>{{ user.get_role_display }}</strong></div><div><small>Service No.</small><strong>{{ user.service_number|default:"Not entered" }}</strong></div><div><small>Date</small><strong>{{ today }}</strong></div></div></section>
 </div>
 
-<section class="card manpower-table-card">
-  <div class="card-heading"><div><span class="eyebrow">Company View</span><h2>Manpower Summary</h2></div><input id="companyFilter" class="compact-search" type="search" placeholder="Filter company…"></div>
-  <div class="table-wrap"><table class="data-table interactive-table" id="companyTable"><thead><tr><th>Company</th><th>Total</th><th>Present</th><th>Leave</th><th>TD</th><th>Course</th><th>Sick</th><th>Attached Out</th><th>Presence</th></tr></thead><tbody>
-    {% for row in company_summary %}<tr data-company="{{ row.company.name|lower }}"><td><strong>{{ row.company.name }}</strong></td><td>{{ row.total }}</td><td>{{ row.present }}</td><td>{{ row.leave }}</td><td>{{ row.td }}</td><td>{{ row.course }}</td><td>{{ row.hospital }}</td><td>{{ row.attached_out }}</td><td><div class="progress-bar"><span style="width:{% widthratio row.present row.total 100 %}%"></span></div></td></tr>{% empty %}<tr><td colspan="9" class="empty-state">No company data available.</td></tr>{% endfor %}
-  </tbody></table></div>
-</section>
+<section class="card manpower-table-card"><div class="card-heading"><div><span class="eyebrow">Company View</span><h2>Manpower Summary</h2></div><input id="companyFilter" class="compact-search" type="search" placeholder="Filter company…"></div><div class="table-wrap"><table class="data-table interactive-table" id="companyTable"><thead><tr><th>Company</th><th>Total</th><th>Present</th><th>Leave</th><th>TD</th><th>Course</th><th>Sick</th><th>Attached Out</th><th>Presence</th></tr></thead><tbody>{% for row in company_summary %}<tr data-company="{{ row.company.name|lower }}"><td><strong>{{ row.company.name }}</strong></td><td>{{ row.total }}</td><td>{{ row.present }}</td><td>{{ row.leave }}</td><td>{{ row.td }}</td><td>{{ row.course }}</td><td>{{ row.hospital }}</td><td>{{ row.attached_out }}</td><td><div class="progress-bar"><span style="width:{% widthratio row.present row.total 100 %}%"></span></div></td></tr>{% empty %}<tr><td colspan="9" class="empty-state">No company data available.</td></tr>{% endfor %}</tbody></table></div></section>
 
 <div class="dashboard-grid-two activity-row">
-  <section class="card"><div class="card-heading"><div><span class="eyebrow">Leave Management</span><h2>Upcoming Returns</h2></div><a href="{% url 'absence:due_to_return' %}">See all →</a></div><div class="timeline-list">{% for a in upcoming_returns %}<a class="timeline-item" href="{% url 'personnel:detail' a.person.pk %}"><span class="timeline-date">{{ a.to_date|date:"d M" }}</span><div><strong>{{ a.person.full_name }}</strong><small>{{ a.person.company.name }} · {{ a.get_type_display }}</small></div><span>→</span></a>{% empty %}<div class="empty-state">No upcoming returns.</div>{% endfor %}</div></section>
-  <section class="card"><div class="card-heading"><div><span class="eyebrow">Duty Management</span><h2>Today's Duties</h2></div><a href="{% url 'dutyroster:upcoming' %}">See all →</a></div><div class="timeline-list">{% for d in today_duties %}<a class="timeline-item" href="{% url 'dutyroster:detail' d.pk %}"><span class="timeline-date">{{ d.shift_time|truncatechars:8 }}</span><div><strong>{{ d.duty_type }}</strong><small>{{ d.company.name }} · {{ d.duty_location }}</small></div><span>→</span></a>{% empty %}<div class="empty-state">No duties scheduled today.</div>{% endfor %}</div></section>
+<section class="card"><div class="card-heading"><div><span class="eyebrow">Leave Management</span><h2>Upcoming Returns</h2></div><a href="{% url 'absence:due_to_return' %}">See all →</a></div><div class="timeline-list">{% for a in upcoming_returns %}<a class="timeline-item" href="{% url 'personnel:detail' a.person.pk %}"><span class="timeline-date">{{ a.to_date|date:"d M" }}</span><div><strong>{{ a.person.full_name }}</strong><small>{{ a.person.company.name }} · {{ a.get_type_display }}</small></div><span>→</span></a>{% empty %}<div class="empty-state">No upcoming returns.</div>{% endfor %}</div></section>
+<section class="card"><div class="card-heading"><div><span class="eyebrow">Calendar</span><h2>Upcoming Events</h2></div>{% if is_super_admin_user %}<a href="{% url 'admin:dashboard_unitevent_changelist' %}">Manage →</a>{% endif %}</div><div class="timeline-list">{% for event in upcoming_events %}<div class="timeline-item"><span class="timeline-date">{{ event.event_date|date:"d M" }}</span><div><strong>{{ event.title }}</strong><small>{{ event.get_event_type_display }}{% if event.company %} · {{ event.company.name }}{% endif %}</small></div></div>{% empty %}<div class="empty-state">No events in the next 30 days.</div>{% endfor %}</div></section>
 </div>
 {% endblock %}
