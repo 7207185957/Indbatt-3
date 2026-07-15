@@ -1,14 +1,6 @@
 # Unit Administration System - Python dependencies
-#
 # Django 5.2 is used because the current Mac installation runs Python 3.14.
-# The application remains LAN-only and uses SQLite for the prototype.
-#
-# To migrate to PostgreSQL for production, additionally install:
-#   psycopg2-binary>=2.9,<3.0
-#
-# To add Excel export later, additionally install:
-#   openpyxl>=3.1,<4.0
-# To add PDF export later, additionally install:
-#   reportlab>=4.0,<5.0  (or WeasyPrint / xhtml2pdf)
+# Pillow enables local profile-photo and dashboard-image uploads.
 
 Django>=5.2.8,<6.0
+Pillow>=11.0,<12.0
