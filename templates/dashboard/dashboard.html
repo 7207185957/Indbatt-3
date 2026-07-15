@@ -1,140 +1,91 @@
 {% extends "base.html" %}
 {% block title %}Dashboard - {{ UNIT_NAME }}{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block page_title %}Battalion Dashboard{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<section class="command-hero">
   <div>
-    <h1>Unit Dashboard</h1>
-    <p class="subtitle">
-      {% if is_scoped %}Showing data for your assigned company/sub-unit only.{% else %}Full unit view.{% endif %}
-      As of {{ today }}.
+    <p class="text-muted" style="text-transform:uppercase; letter-spacing:.12em; font-weight:700;">Infantry Battalion Administration</p>
+    <h1>{{ UNIT_NAME }}</h1>
+    <p>
+      Welcome, {% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}.
+      {% if is_scoped %}You are viewing {{ user.company.name|default:"your assigned branch" }} data.{% else %}You are viewing the full unit administrative picture.{% endif %}
     </p>
   </div>
+  <div class="command-insignia">★</div>
+</section>
+
+<div class="announcement-strip">
+  <div class="announcement-label">Unit Scroll</div>
+  <div class="announcement-track">Daily strength returns are to be completed on time • Verify leave return dates • Review upcoming duties • Use only non-classified administrative information in this system</div>
 </div>
 
 <div class="stat-grid">
-  <div class="stat-card">
-    <div class="stat-value">{{ total_active }}</div>
-    <div class="stat-label">Total Active Personnel</div>
-  </div>
-  <div class="stat-card accent-success">
-    <div class="stat-value">{{ present_count }}</div>
-    <div class="stat-label">Present</div>
-  </div>
-  <div class="stat-card accent-warning">
-    <div class="stat-value">{{ absent_count }}</div>
-    <div class="stat-label">Absent (all categories)</div>
-  </div>
-  <div class="stat-card accent-warning">
-    <div class="stat-value">{{ leave_count }}</div>
-    <div class="stat-label">On Leave</div>
-  </div>
-  <div class="stat-card accent-info">
-    <div class="stat-value">{{ td_course_count }}</div>
-    <div class="stat-label">On Course / TD</div>
-  </div>
-  <div class="stat-card accent-info">
-    <div class="stat-value">{{ today_duties|length }}</div>
-    <div class="stat-label">Today's Duties</div>
-  </div>
+  <div class="stat-card"><div class="stat-value">{{ total_active }}</div><div class="stat-label">Total Strength</div></div>
+  <div class="stat-card accent-success"><div class="stat-value">{{ present_count }}</div><div class="stat-label">Present</div></div>
+  <div class="stat-card accent-warning"><div class="stat-value">{{ leave_count }}</div><div class="stat-label">On Leave</div></div>
+  <div class="stat-card accent-danger"><div class="stat-value">{{ absent_count }}</div><div class="stat-label">Total Absent</div></div>
+  <div class="stat-card accent-info"><div class="stat-value">{{ td_course_count }}</div><div class="stat-label">TD / Course</div></div>
+  <div class="stat-card accent-info"><div class="stat-value">{{ today_duties|length }}</div><div class="stat-label">Today's Duties</div></div>
 </div>
 
-<div class="card">
-  <h2>Company-wise Strength</h2>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Company</th><th>Total</th><th>Present</th><th>Leave</th><th>TD</th><th>Course</th><th>Hospital/Sick</th><th>Attached Out</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in company_summary %}
-        <tr>
-          <td>{{ row.company.name }}</td>
-          <td>{{ row.total }}</td>
-          <td>{{ row.present }}</td>
-          <td>{{ row.leave }}</td>
-          <td>{{ row.td }}</td>
-          <td>{{ row.course }}</td>
-          <td>{{ row.hospital }}</td>
-          <td>{{ row.attached_out }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="8" class="empty-state">No company data available.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="form-grid">
+<div class="dashboard-grid-two">
   <div class="card">
-    <h2>Upcoming Returns from Leave / TD</h2>
+    <h2>Manpower Summary</h2>
     <div class="table-wrap">
       <table class="data-table">
-        <thead><tr><th>Name</th><th>Company</th><th>Type</th><th>Return Date</th></tr></thead>
+        <thead><tr><th>Company</th><th>Total</th><th>Present</th><th>Leave</th><th>TD</th><th>Course</th><th>Sick</th><th>Attached Out</th></tr></thead>
         <tbody>
-          {% for a in upcoming_returns %}
+          {% for row in company_summary %}
           <tr>
-            <td><a href="{% url 'personnel:detail' a.person.pk %}">{{ a.person.full_name }}</a></td>
-            <td>{{ a.person.company.name }}</td>
-            <td>{{ a.get_type_display }}</td>
-            <td>{{ a.to_date }}</td>
+            <td><strong>{{ row.company.name }}</strong></td><td>{{ row.total }}</td><td>{{ row.present }}</td><td>{{ row.leave }}</td><td>{{ row.td }}</td><td>{{ row.course }}</td><td>{{ row.hospital }}</td><td>{{ row.attached_out }}</td>
           </tr>
-          {% empty %}
-          <tr><td colspan="4" class="empty-state">No upcoming returns.</td></tr>
-          {% endfor %}
+          {% empty %}<tr><td colspan="8" class="empty-state">No company data available.</td></tr>{% endfor %}
         </tbody>
       </table>
     </div>
-    <p style="margin-top:10px;"><a href="{% url 'absence:due_to_return' %}">View full due-to-return list &rarr;</a></p>
+  </div>
+
+  <div class="card">
+    <h2>Logged-in Branch Head</h2>
+    <div class="branch-profile" style="margin:14px 0 18px;">
+      <div class="branch-avatar" style="width:72px;height:72px;font-size:1.35rem;">{{ user.first_name|first|default:user.username|first|upper }}</div>
+      <div>
+        <strong style="font-size:1.05rem;">{% if user.rank %}{{ user.rank }} {% endif %}{{ user.get_full_name|default:user.username }}</strong>
+        <small>{{ user.company.name|default:user.get_role_display }}</small>
+        <small>{{ user.service_number|default:"Profile details can be updated in Users" }}</small>
+      </div>
+    </div>
+    <ul class="kv-list">
+      <li><span class="k">Access Role</span><span class="v">{{ user.get_role_display }}</span></li>
+      <li><span class="k">Branch / Company</span><span class="v">{{ user.company.name|default:"Unit-wide" }}</span></li>
+      <li><span class="k">Date</span><span class="v">{{ today }}</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="form-grid" style="margin-top:16px;">
+  <div class="card">
+    <h2>Upcoming Returns</h2>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Company</th><th>Type</th><th>Return</th></tr></thead><tbody>
+      {% for a in upcoming_returns %}<tr><td><a href="{% url 'personnel:detail' a.person.pk %}">{{ a.person.full_name }}</a></td><td>{{ a.person.company.name }}</td><td>{{ a.get_type_display }}</td><td>{{ a.to_date }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="empty-state">No upcoming returns.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <p><a href="{% url 'absence:due_to_return' %}">Open full due-to-return list →</a></p>
   </div>
 
   <div class="card">
     <h2>Today's Duties</h2>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead><tr><th>Duty Type</th><th>Company</th><th>Location/Post</th><th>Shift</th></tr></thead>
-        <tbody>
-          {% for d in today_duties %}
-          <tr>
-            <td><a href="{% url 'dutyroster:detail' d.pk %}">{{ d.duty_type }}</a></td>
-            <td>{{ d.company.name }}</td>
-            <td>{{ d.duty_location }}</td>
-            <td>{{ d.shift_time }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="4" class="empty-state">No duties scheduled today.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <p style="margin-top:10px;"><a href="{% url 'dutyroster:upcoming' %}">View upcoming duties &rarr;</a></p>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Duty</th><th>Company</th><th>Post</th><th>Shift</th></tr></thead><tbody>
+      {% for d in today_duties %}<tr><td><a href="{% url 'dutyroster:detail' d.pk %}">{{ d.duty_type }}</a></td><td>{{ d.company.name }}</td><td>{{ d.duty_location }}</td><td>{{ d.shift_time }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="empty-state">No duties scheduled today.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <p><a href="{% url 'dutyroster:upcoming' %}">Open upcoming duties →</a></p>
   </div>
 </div>
 
 <div class="form-grid">
-  <div class="card">
-    <h2>Recently Updated Personnel</h2>
-    <ul class="kv-list">
-      {% for p in recent_personnel %}
-        <li><span class="k"><a href="{% url 'personnel:detail' p.pk %}">{{ p.full_name }} ({{ p.army_number }})</a></span><span class="v">{{ p.updated_at|date:"d M Y H:i" }}</span></li>
-      {% empty %}
-        <li class="empty-state">No records yet.</li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Recently Updated Absence Records</h2>
-    <ul class="kv-list">
-      {% for a in recent_absence %}
-        <li><span class="k"><a href="{% url 'absence:detail' a.pk %}">{{ a.person.full_name }} - {{ a.get_type_display }}</a></span><span class="v">{{ a.updated_at|date:"d M Y H:i" }}</span></li>
-      {% empty %}
-        <li class="empty-state">No records yet.</li>
-      {% endfor %}
-    </ul>
-  </div>
+  <div class="card"><h2>Recently Updated Personnel</h2><ul class="kv-list">{% for p in recent_personnel %}<li><span class="k"><a href="{% url 'personnel:detail' p.pk %}">{{ p.full_name }}</a></span><span class="v">{{ p.updated_at|date:"d M H:i" }}</span></li>{% empty %}<li class="empty-state">No records yet.</li>{% endfor %}</ul></div>
+  <div class="card"><h2>Recently Updated Absence Records</h2><ul class="kv-list">{% for a in recent_absence %}<li><span class="k"><a href="{% url 'absence:detail' a.pk %}">{{ a.person.full_name }} — {{ a.get_type_display }}</a></span><span class="v">{{ a.updated_at|date:"d M H:i" }}</span></li>{% empty %}<li class="empty-state">No records yet.</li>{% endfor %}</ul></div>
 </div>
 {% endblock %}
