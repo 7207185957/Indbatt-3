@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -6,8 +9,9 @@ from absence.models import AbsenceRecord
 from core.roles import accessible_company_ids, can_edit_records
 from dutyroster.models import DutyRoster
 from personnel.models import Personnel
-from strength.models import DailyStrength
 from unitstructure.models import Company
+
+from .models import DashboardAnnouncement, DashboardHeroSlide, UnitEvent
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -52,11 +56,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'attached_out': company_personnel.filter(status=Personnel.STATUS_ATTACHED_OUT).count(),
             })
 
-        upcoming_returns = absence_qs.select_related('person', 'person__company').order_by('to_date')[:8]
-        today_duties = duty_qs.select_related('company').prefetch_related('personnel_detailed')[:8]
+        announcement_q = Q(is_active=True) & (Q(starts_on__isnull=True) | Q(starts_on__lte=today)) & (Q(ends_on__isnull=True) | Q(ends_on__gte=today))
+        announcements = DashboardAnnouncement.objects.filter(announcement_q)[:8]
+        hero_slides = DashboardHeroSlide.objects.filter(is_active=True)[:5]
 
-        recent_personnel = personnel_qs.order_by('-updated_at')[:5]
-        recent_absence = absence_qs.order_by('-updated_at')[:5]
+        events_qs = UnitEvent.objects.filter(
+            is_active=True,
+            event_date__gte=today,
+            event_date__lte=today + timedelta(days=30),
+        )
+        if company_ids is not None:
+            events_qs = events_qs.filter(Q(company__isnull=True) | Q(company_id__in=company_ids))
 
         context.update({
             'total_active': total_active,
@@ -65,10 +75,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'leave_count': leave_count,
             'td_course_count': td_course_count,
             'company_summary': company_summary,
-            'upcoming_returns': upcoming_returns,
-            'today_duties': today_duties,
-            'recent_personnel': recent_personnel,
-            'recent_absence': recent_absence,
+            'upcoming_returns': absence_qs.select_related('person', 'person__company').order_by('to_date')[:8],
+            'today_duties': duty_qs.select_related('company').prefetch_related('personnel_detailed')[:8],
+            'recent_personnel': personnel_qs.order_by('-updated_at')[:5],
+            'recent_absence': absence_qs.order_by('-updated_at')[:5],
+            'announcements': announcements,
+            'hero_slides': hero_slides,
+            'upcoming_events': events_qs.select_related('company')[:8],
             'today': today,
             'can_edit': can_edit_records(user),
             'is_scoped': company_ids is not None,
