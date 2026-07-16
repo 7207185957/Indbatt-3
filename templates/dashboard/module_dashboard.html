@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ module.name }} - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}{{ module.name }} Workspace{% endblock %}
+
+{% block content %}
+<div class="command-centre module-workspace-page">
+  <section class="command-hero dense-hero module-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Unit Module Workspace</span>
+      <h1>{{ module.icon }} {{ module.name }}</h1>
+      <p>{{ module.summary }}</p>
+      <div class="hero-actions">
+        <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">← Unit Dashboard</a>
+        {% if module_slug == 'administration' %}
+          <a href="{% url 'admin:index' %}" class="btn">Open System Admin</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-visual"><div class="command-insignia">{{ module.icon }}</div></div>
+  </section>
+
+  <div class="announcement-strip">
+    <div class="announcement-label">Module Status</div>
+    <div class="announcement-track">Workspace structure is ready. Registers and reports will be activated module by module without using invented figures.</div>
+  </div>
+
+  <div class="workspace-card-grid">
+    {% for item in module.sections %}
+      <section class="panel workspace-card {% if forloop.first %}workspace-card-primary{% endif %}">
+        <div class="workspace-card-icon">{{ module.icon }}</div>
+        <div>
+          <small>{% if forloop.first %}Workspace overview{% else %}Planned section{% endif %}</small>
+          <h2>{{ item }}</h2>
+          <p>{% if forloop.first %}Module landing page and administrative status summary.{% else %}This section will be connected when its register and permissions are built.{% endif %}</p>
+        </div>
+        <span class="status-pill {% if forloop.first %}status-live{% endif %}">{% if forloop.first %}Ready{% else %}Planned{% endif %}</span>
+      </section>
+    {% endfor %}
+  </div>
+
+  {% if module_slug == 'administration' %}
+  <div class="dense-lower-grid">
+    <section class="panel">
+      <div class="panel-head"><h2>Current Announcements</h2></div>
+      <div class="dense-list">
+        {% for item in announcements %}<div class="timeline-item"><span class="timeline-date">•</span><div><strong>{{ item.message }}</strong><small>Active notice</small></div></div>{% empty %}<div class="empty-state">No active announcements.</div>{% endfor %}
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Upcoming Events</h2></div>
+      <div class="dense-list">
+        {% for event in upcoming_events %}<div class="timeline-item"><span class="timeline-date">{{ event.event_date|date:"d M" }}</span><div><strong>{{ event.title }}</strong><small>{% if event.company %}{{ event.company.name }}{% else %}Unit-wide{% endif %}</small></div></div>{% empty %}<div class="empty-state">No upcoming events.</div>{% endfor %}
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Administrative Tools</h2></div>
+      <div class="quick-strip">
+        {% if is_super_admin_user %}<a href="{% url 'accounts:user_list' %}" class="quick-action"><span>♙</span><strong>User Accounts</strong><small>Manage logins</small></a>{% endif %}
+        <a href="{% url 'admin:index' %}" class="quick-action"><span>⚙</span><strong>System Admin</strong><small>Manage records</small></a>
+      </div>
+    </section>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
