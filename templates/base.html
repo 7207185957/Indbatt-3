@@ -23,11 +23,11 @@
       <li><a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.url_name == 'home' and request.resolver_match.app_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span><span class="nav-label">Unit Dashboard</span></a></li>
       <li class="nav-section-label"><span class="nav-label">UNIT MODULES</span></li>
       <li><a href="{% url 'dashboard:manpower' %}" class="{% if request.resolver_match.url_name == 'manpower' or request.resolver_match.app_name == 'personnel' or request.resolver_match.app_name == 'absence' or request.resolver_match.app_name == 'strength' or request.resolver_match.app_name == 'dutyroster' or request.resolver_match.app_name == 'reports' %}active{% endif %}"><span class="nav-icon">♟</span><span class="nav-label">Manpower</span></a></li>
-      <li class="nav-planned"><span><span class="nav-icon">▣</span><span class="nav-label">Transport</span><small>Planned</small></span></li>
-      <li class="nav-planned"><span><span class="nav-icon">▤</span><span class="nav-label">Stores</span><small>Planned</small></span></li>
-      <li class="nav-planned"><span><span class="nav-icon">◎</span><span class="nav-label">Training</span><small>Planned</small></span></li>
-      <li class="nav-planned"><span><span class="nav-icon">✚</span><span class="nav-label">Medical</span><small>Planned</small></span></li>
-      <li class="nav-planned"><span><span class="nav-icon">▦</span><span class="nav-label">Administration</span><small>Planned</small></span></li>
+      <li><a href="{% url 'dashboard:module' 'transport' %}" class="{% if request.resolver_match.kwargs.module_slug == 'transport' %}active{% endif %}"><span class="nav-icon">▣</span><span class="nav-label">Transport</span></a></li>
+      <li><a href="{% url 'dashboard:module' 'stores' %}" class="{% if request.resolver_match.kwargs.module_slug == 'stores' %}active{% endif %}"><span class="nav-icon">▤</span><span class="nav-label">Stores</span></a></li>
+      <li><a href="{% url 'dashboard:module' 'training' %}" class="{% if request.resolver_match.kwargs.module_slug == 'training' %}active{% endif %}"><span class="nav-icon">◎</span><span class="nav-label">Training</span></a></li>
+      <li><a href="{% url 'dashboard:module' 'medical' %}" class="{% if request.resolver_match.kwargs.module_slug == 'medical' %}active{% endif %}"><span class="nav-icon">✚</span><span class="nav-label">Medical</span></a></li>
+      <li><a href="{% url 'dashboard:module' 'administration' %}" class="{% if request.resolver_match.kwargs.module_slug == 'administration' %}active{% endif %}"><span class="nav-icon">▦</span><span class="nav-label">Administration</span></a></li>
       {% if request.resolver_match.url_name == 'manpower' or request.resolver_match.app_name == 'personnel' or request.resolver_match.app_name == 'absence' or request.resolver_match.app_name == 'strength' or request.resolver_match.app_name == 'dutyroster' or request.resolver_match.app_name == 'reports' %}
       <li class="nav-section-label"><span class="nav-label">MANPOWER WORKSPACE</span></li>
       <li><a href="{% url 'personnel:list' %}"><span class="nav-icon">•</span><span class="nav-label">Personnel Records</span></a></li>
@@ -35,6 +35,12 @@
       <li><a href="{% url 'strength:list' %}"><span class="nav-icon">•</span><span class="nav-label">Daily Strength</span></a></li>
       <li><a href="{% url 'dutyroster:list' %}"><span class="nav-icon">•</span><span class="nav-label">Duty Roster</span></a></li>
       <li><a href="{% url 'reports:home' %}"><span class="nav-icon">•</span><span class="nav-label">Manpower Reports</span></a></li>
+      {% endif %}
+      {% if request.resolver_match.kwargs.module_slug %}
+      <li class="nav-section-label"><span class="nav-label">MODULE WORKSPACE</span></li>
+      <li><span class="nav-static"><span class="nav-icon">•</span><span class="nav-label">Dashboard</span></span></li>
+      <li><span class="nav-static"><span class="nav-icon">•</span><span class="nav-label">Registers</span></span></li>
+      <li><span class="nav-static"><span class="nav-icon">•</span><span class="nav-label">Reports</span></span></li>
       {% endif %}
       {% if is_super_admin_user %}
         <li class="nav-section-label"><span class="nav-label">SYSTEM</span></li>
