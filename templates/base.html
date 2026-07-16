@@ -20,13 +20,24 @@
       <div class="brand-copy"><strong>{{ UNIT_NAME }}</strong><small>One Team, One Mission</small></div>
     </div>
     <ul class="sidebar-nav">
-      <li><a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span><span class="nav-label">Dashboard</span></a></li>
-      <li><a href="{% url 'personnel:list' %}" class="{% if request.resolver_match.app_name == 'personnel' %}active{% endif %}"><span class="nav-icon">♟</span><span class="nav-label">Manpower</span></a></li>
-      <li><a href="{% url 'absence:list' %}" class="{% if request.resolver_match.app_name == 'absence' %}active{% endif %}"><span class="nav-icon">◷</span><span class="nav-label">Leave / TD</span></a></li>
-      <li><a href="{% url 'strength:list' %}" class="{% if request.resolver_match.app_name == 'strength' %}active{% endif %}"><span class="nav-icon">▥</span><span class="nav-label">Daily Strength</span></a></li>
-      <li><a href="{% url 'dutyroster:list' %}" class="{% if request.resolver_match.app_name == 'dutyroster' %}active{% endif %}"><span class="nav-icon">✓</span><span class="nav-label">Duty Roster</span></a></li>
-      <li><a href="{% url 'reports:home' %}" class="{% if request.resolver_match.app_name == 'reports' %}active{% endif %}"><span class="nav-icon">▤</span><span class="nav-label">Reports & Analytics</span></a></li>
+      <li><a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.url_name == 'home' and request.resolver_match.app_name == 'dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span><span class="nav-label">Unit Dashboard</span></a></li>
+      <li class="nav-section-label"><span class="nav-label">UNIT MODULES</span></li>
+      <li><a href="{% url 'dashboard:manpower' %}" class="{% if request.resolver_match.url_name == 'manpower' or request.resolver_match.app_name == 'personnel' or request.resolver_match.app_name == 'absence' or request.resolver_match.app_name == 'strength' or request.resolver_match.app_name == 'dutyroster' or request.resolver_match.app_name == 'reports' %}active{% endif %}"><span class="nav-icon">♟</span><span class="nav-label">Manpower</span></a></li>
+      <li class="nav-planned"><span><span class="nav-icon">▣</span><span class="nav-label">Transport</span><small>Planned</small></span></li>
+      <li class="nav-planned"><span><span class="nav-icon">▤</span><span class="nav-label">Stores</span><small>Planned</small></span></li>
+      <li class="nav-planned"><span><span class="nav-icon">◎</span><span class="nav-label">Training</span><small>Planned</small></span></li>
+      <li class="nav-planned"><span><span class="nav-icon">✚</span><span class="nav-label">Medical</span><small>Planned</small></span></li>
+      <li class="nav-planned"><span><span class="nav-icon">▦</span><span class="nav-label">Administration</span><small>Planned</small></span></li>
+      {% if request.resolver_match.url_name == 'manpower' or request.resolver_match.app_name == 'personnel' or request.resolver_match.app_name == 'absence' or request.resolver_match.app_name == 'strength' or request.resolver_match.app_name == 'dutyroster' or request.resolver_match.app_name == 'reports' %}
+      <li class="nav-section-label"><span class="nav-label">MANPOWER WORKSPACE</span></li>
+      <li><a href="{% url 'personnel:list' %}"><span class="nav-icon">•</span><span class="nav-label">Personnel Records</span></a></li>
+      <li><a href="{% url 'absence:list' %}"><span class="nav-icon">•</span><span class="nav-label">Leave / TD</span></a></li>
+      <li><a href="{% url 'strength:list' %}"><span class="nav-icon">•</span><span class="nav-label">Daily Strength</span></a></li>
+      <li><a href="{% url 'dutyroster:list' %}"><span class="nav-icon">•</span><span class="nav-label">Duty Roster</span></a></li>
+      <li><a href="{% url 'reports:home' %}"><span class="nav-icon">•</span><span class="nav-label">Manpower Reports</span></a></li>
+      {% endif %}
       {% if is_super_admin_user %}
+        <li class="nav-section-label"><span class="nav-label">SYSTEM</span></li>
         <li><a href="{% url 'accounts:user_list' %}" class="{% if request.resolver_match.app_name == 'accounts' %}active{% endif %}"><span class="nav-icon">♙</span><span class="nav-label">Users</span></a></li>
         <li><a href="{% url 'admin:index' %}"><span class="nav-icon">⚙</span><span class="nav-label">System Admin</span></a></li>
       {% endif %}
