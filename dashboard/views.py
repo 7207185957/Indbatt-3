@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import Http404
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -12,6 +13,40 @@ from personnel.models import Personnel
 from unitstructure.models import Company
 
 from .models import DashboardAnnouncement, DashboardHeroSlide, UnitEvent
+
+
+MODULE_WORKSPACES = {
+    'transport': {
+        'name': 'Transport',
+        'icon': '▣',
+        'summary': 'Administrative workspace for transport records and availability.',
+        'sections': ['Dashboard', 'Register', 'Availability', 'Maintenance', 'Fuel Records', 'Reports'],
+    },
+    'stores': {
+        'name': 'Stores',
+        'icon': '▤',
+        'summary': 'Administrative workspace for stock, receipts, issues and reports.',
+        'sections': ['Dashboard', 'Stock Register', 'Receipts and Issues', 'Demands', 'Deficiencies', 'Reports'],
+    },
+    'training': {
+        'name': 'Training',
+        'icon': '◎',
+        'summary': 'Administrative workspace for schedules, attendance and results.',
+        'sections': ['Dashboard', 'Calendar', 'Attendance', 'Results', 'Certificates', 'Reports'],
+    },
+    'medical': {
+        'name': 'Medical',
+        'icon': '✚',
+        'summary': 'Administrative workspace for non-sensitive medical returns and inspections.',
+        'sections': ['Dashboard', 'Sick Report', 'Hospital Records', 'Inspections', 'Due Actions', 'Reports'],
+    },
+    'administration': {
+        'name': 'Administration',
+        'icon': '▦',
+        'summary': 'Unit notices, events, returns and system administration.',
+        'sections': ['Dashboard', 'Announcements', 'Events', 'Pending Returns', 'User Accounts', 'System Admin'],
+    },
+}
 
 
 class UnitDashboardView(LoginRequiredMixin, TemplateView):
@@ -132,6 +167,29 @@ class ManpowerDashboardView(LoginRequiredMixin, TemplateView):
             'today': today,
             'can_edit': can_edit_records(user),
             'is_scoped': company_ids is not None,
+        })
+        return context
+
+
+class ModuleDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboard/module_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        module_slug = kwargs.get('module_slug')
+        module = MODULE_WORKSPACES.get(module_slug)
+        if module is None:
+            raise Http404('Module not found')
+
+        context.update({
+            'module_slug': module_slug,
+            'module': module,
+            'today': timezone.localdate(),
+            'announcements': DashboardAnnouncement.objects.filter(is_active=True)[:5],
+            'upcoming_events': UnitEvent.objects.filter(
+                is_active=True,
+                event_date__gte=timezone.localdate(),
+            ).select_related('company')[:5],
         })
         return context
 
