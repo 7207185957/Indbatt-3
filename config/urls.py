@@ -24,6 +24,7 @@ urlpatterns = [
     path('duty/', include('dutyroster.urls')),
     path('reports/', include('reports.urls')),
     path('accounts/', include('accounts.urls')),
+    path('transport/', include('transport.urls')),
 ]
 
 if settings.DEBUG:
