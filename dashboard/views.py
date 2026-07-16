@@ -14,7 +14,54 @@ from unitstructure.models import Company
 from .models import DashboardAnnouncement, DashboardHeroSlide, UnitEvent
 
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class UnitDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboard/unit_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        today = timezone.localdate()
+        company_ids = accessible_company_ids(user)
+
+        personnel_qs = Personnel.objects.filter(is_active=True)
+        absence_qs = AbsenceRecord.objects.filter(
+            from_date__lte=today,
+            to_date__gte=today,
+        ).exclude(status__in=[AbsenceRecord.STATUS_RETURNED, AbsenceRecord.STATUS_CANCELLED])
+        duty_qs = DutyRoster.objects.filter(duty_date=today)
+
+        if company_ids is not None:
+            personnel_qs = personnel_qs.filter(company_id__in=company_ids)
+            absence_qs = absence_qs.filter(person__company_id__in=company_ids)
+            duty_qs = duty_qs.filter(company_id__in=company_ids)
+
+        total_active = personnel_qs.count()
+        present_count = personnel_qs.filter(status=Personnel.STATUS_PRESENT).count()
+
+        announcement_q = Q(is_active=True) & (Q(starts_on__isnull=True) | Q(starts_on__lte=today)) & (Q(ends_on__isnull=True) | Q(ends_on__gte=today))
+        announcements = DashboardAnnouncement.objects.filter(announcement_q)[:8]
+        events_qs = UnitEvent.objects.filter(
+            is_active=True,
+            event_date__gte=today,
+            event_date__lte=today + timedelta(days=30),
+        )
+        if company_ids is not None:
+            events_qs = events_qs.filter(Q(company__isnull=True) | Q(company_id__in=company_ids))
+
+        context.update({
+            'total_active': total_active,
+            'present_count': present_count,
+            'current_absence_count': absence_qs.count(),
+            'today_duty_count': duty_qs.count(),
+            'announcements': announcements,
+            'upcoming_events': events_qs.select_related('company')[:8],
+            'today': today,
+            'is_scoped': company_ids is not None,
+        })
+        return context
+
+
+class ManpowerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/dashboard.html'
 
     def get_context_data(self, **kwargs):
@@ -87,3 +134,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'is_scoped': company_ids is not None,
         })
         return context
+
+
+DashboardView = UnitDashboardView
