@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Strength Detail - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Daily Strength Detail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ strength.company.name }} - {{ strength.date }}</h1>
+  <div class="btn-row">
+    <a href="{% url 'strength:list' %}" class="btn btn-outline">&larr; Back to list</a>
+    {% if can_edit %}<a href="{% url 'strength:edit' strength.pk %}" class="btn">Edit</a>{% endif %}
+  </div>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <ul class="kv-list">
+    <li><span class="k">Date</span><span class="v">{{ strength.date }}</span></li>
+    <li><span class="k">Company / Sub-unit</span><span class="v">{{ strength.company.name }}</span></li>
+    <li><span class="k">Total Posted Strength</span><span class="v">{{ strength.total_posted_strength }}</span></li>
+    <li><span class="k">Present</span><span class="v">{{ strength.present }}</span></li>
+    <li><span class="k">Leave</span><span class="v">{{ strength.leave }}</span></li>
+    <li><span class="k">Temporary Duty</span><span class="v">{{ strength.temporary_duty }}</span></li>
+    <li><span class="k">Course</span><span class="v">{{ strength.course }}</span></li>
+    <li><span class="k">Hospital / Sick</span><span class="v">{{ strength.hospital_sick }}</span></li>
+    <li><span class="k">Attached Out</span><span class="v">{{ strength.attached_out }}</span></li>
+    <li><span class="k">Other Absence</span><span class="v">{{ strength.other_absence }}</span></li>
+    <li><span class="k">Total Absent</span><span class="v">{{ strength.total_absent }}</span></li>
+    <li><span class="k">Balanced?</span><span class="v">{% if strength.is_balanced %}<span class="badge badge-success">Yes</span>{% else %}<span class="badge badge-warning">Check figures</span>{% endif %}</span></li>
+    <li><span class="k">Remarks</span><span class="v">{{ strength.remarks|default:"-" }}</span></li>
+  </ul>
+  <p class="help-text" style="margin-top:12px;">
+    Created by {{ strength.created_by|default:"-" }} on {{ strength.created_at|date:"d M Y H:i" }}.<br>
+    Last updated by {{ strength.updated_by|default:"-" }} on {{ strength.updated_at|date:"d M Y H:i" }}.
+  </p>
+</div>
+{% endblock %}

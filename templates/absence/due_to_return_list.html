@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Due to Return - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Due to Return{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Personnel Due to Return</h1>
+    <p class="subtitle">Currently on Leave/TD/Course/Hospital/Attachment, returning within the selected window.</p>
+  </div>
+  <a href="{% url 'absence:list' %}" class="btn btn-outline">&larr; All Absence Records</a>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="form-group">
+    <label>Within (days)</label>
+    <select name="days" class="form-select">
+      <option value="3" {% if days == "3" %}selected{% endif %}>3 days</option>
+      <option value="7" {% if days == "7" %}selected{% endif %}>7 days</option>
+      <option value="14" {% if days == "14" %}selected{% endif %}>14 days</option>
+      <option value="30" {% if days == "30" %}selected{% endif %}>30 days</option>
+    </select>
+  </div>
+  <div class="form-group"><button type="submit" class="btn btn-secondary">Apply</button></div>
+</form>
+
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Name</th><th>Company</th><th>Type</th><th>From</th><th>Return Date (To)</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for a in absence_list %}
+      <tr>
+        <td><a href="{% url 'personnel:detail' a.person.pk %}">{{ a.person.full_name }}</a></td>
+        <td>{{ a.person.company.name }}</td>
+        <td>{{ a.get_type_display }}</td>
+        <td>{{ a.from_date }}</td>
+        <td>{{ a.to_date }}</td>
+        <td><span class="badge badge-{{ a.status_badge_class }}">{{ a.get_status_display }}</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="empty-state">No one due to return in this window.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

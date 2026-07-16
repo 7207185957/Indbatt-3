@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Unit Dashboard - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Unit Command Dashboard{% endblock %}
+{% block content %}
+<div class="command-centre">
+  <section class="command-hero dense-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Unit Administration Overview</span>
+      <h1>{{ UNIT_NAME }}</h1>
+      <p>High-level administrative picture across unit modules. Open a module for detailed records and workflows.</p>
+    </div>
+    <div class="hero-visual"><div class="command-insignia">★</div></div>
+  </section>
+
+  <div class="announcement-strip"><div class="announcement-label">Unit Scroll</div><div class="announcement-track">{% for item in announcements %}{{ item.message }}{% if not forloop.last %} • {% endif %}{% empty %}Unit dashboard active • Open a module for detailed administration{% endfor %}</div></div>
+
+  <div class="module-command-grid">
+    <a class="module-command-card live" href="{% url 'dashboard:manpower' %}"><span class="module-icon">♟</span><div><small>LIVE MODULE</small><h2>Manpower</h2><p>Personnel, leave, TD, daily strength, duties and reports.</p><div class="module-metrics"><strong>{{ total_active }}</strong> posted <strong>{{ present_count }}</strong> present <strong>{{ current_absence_count }}</strong> absent</div></div><b>Open →</b></a>
+    <div class="module-command-card planned"><span class="module-icon">▣</span><div><small>PLANNED MODULE</small><h2>Transport</h2><p>Vehicle register, serviceability, maintenance, fuel and reports.</p></div><b>Planned</b></div>
+    <div class="module-command-card planned"><span class="module-icon">▤</span><div><small>PLANNED MODULE</small><h2>Stores</h2><p>Stock, receipts, issues, demands, deficiencies and reports.</p></div><b>Planned</b></div>
+    <div class="module-command-card planned"><span class="module-icon">◎</span><div><small>PLANNED MODULE</small><h2>Training</h2><p>Training calendar, attendance, results and reports.</p></div><b>Planned</b></div>
+    <div class="module-command-card planned"><span class="module-icon">✚</span><div><small>PLANNED MODULE</small><h2>Medical</h2><p>Sick reports, hospitalisation, inspections and medical reports.</p></div><b>Planned</b></div>
+    <div class="module-command-card planned"><span class="module-icon">⌂</span><div><small>PLANNED MODULE</small><h2>Administration</h2><p>Events, correspondence, documents, notices and approvals.</p></div><b>Planned</b></div>
+  </div>
+
+  <div class="dense-lower-grid">
+    <section class="panel"><div class="panel-head"><h2>Current Unit Indicators</h2></div><div class="dense-list"><a class="timeline-item" href="{% url 'dashboard:manpower' %}"><span class="timeline-date">{{ present_count }}</span><div><strong>Personnel present</strong><small>Open manpower dashboard</small></div><span>→</span></a><a class="timeline-item" href="{% url 'dutyroster:list' %}"><span class="timeline-date">{{ today_duty_count }}</span><div><strong>Today's duties</strong><small>Current duty assignments</small></div><span>→</span></a></div></section>
+    <section class="panel"><div class="panel-head"><h2>Upcoming Unit Events</h2></div><div class="dense-list">{% for event in upcoming_events %}<div class="timeline-item"><span class="timeline-date">{{ event.event_date|date:"d M" }}</span><div><strong>{{ event.title }}</strong><small>{{ event.get_event_type_display }}</small></div></div>{% empty %}<div class="empty-state">No events in the next 30 days.</div>{% endfor %}</div></section>
+    <section class="panel"><div class="panel-head"><h2>System Status</h2></div><div class="dense-list"><div class="timeline-item"><span class="timeline-date">●</span><div><strong>Manpower module</strong><small>Operational</small></div></div><div class="timeline-item"><span class="timeline-date">○</span><div><strong>Remaining modules</strong><small>To be developed without fabricated data</small></div></div></div></section>
+  </div>
+</div>
+{% endblock %}

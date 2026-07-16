@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Not Found - {{ UNIT_NAME|default:"Unit Administration System" }}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box">
+      <h1>Page Not Found</h1>
+      <p class="tagline">The page you requested does not exist.</p>
+      <a href="{% url 'dashboard:home' %}" class="btn">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

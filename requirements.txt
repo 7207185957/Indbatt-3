@@ -1,0 +1,6 @@
+# Unit Administration System - Python dependencies
+# Django 5.2 is used because the current Mac installation runs Python 3.14.
+# Pillow enables local profile-photo and dashboard-image uploads.
+
+Django>=5.2.8,<6.0
+Pillow>=11.0,<12.0

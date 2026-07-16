@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Transport - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Transport Dashboard{% endblock %}
+{% block content %}
+<div class="command-centre">
+  <div class="page-header">
+    <div><h1>Transport Dashboard</h1><p class="subtitle">Administrative fleet register and maintenance overview.</p></div>
+    <a href="{% url 'transport:vehicle_list' %}" class="btn">Open Vehicle Register</a>
+  </div>
+  <div class="dense-stat-grid">
+    <div class="stat-card dense-stat"><div class="stat-icon">▣</div><div><div class="stat-value">{{ total_vehicles }}</div><div class="stat-label">Total Vehicles</div></div></div>
+    <div class="stat-card dense-stat accent-success"><div class="stat-icon">●</div><div><div class="stat-value">{{ serviceable_count }}</div><div class="stat-label">Serviceable</div></div></div>
+    <div class="stat-card dense-stat accent-danger"><div class="stat-icon">!</div><div><div class="stat-value">{{ unserviceable_count }}</div><div class="stat-label">Unserviceable</div></div></div>
+    <div class="stat-card dense-stat accent-warning"><div class="stat-icon">⚙</div><div><div class="stat-value">{{ maintenance_count }}</div><div class="stat-label">Under Maintenance</div></div></div>
+  </div>
+  <div class="dense-lower-grid">
+    <section class="panel"><div class="panel-head"><h2>Recent Maintenance</h2></div><div class="dense-list">{% for item in recent_maintenance %}<div class="timeline-item"><span class="timeline-date">{{ item.reported_on|date:'d M' }}</span><div><strong>{{ item.vehicle.registration_number }}</strong><small>{{ item.issue }}</small></div></div>{% empty %}<div class="empty-state">No maintenance records yet.</div>{% endfor %}</div></section>
+    <section class="panel"><div class="panel-head"><h2>Recent Fuel Entries</h2></div><div class="dense-list">{% for item in recent_fuel %}<div class="timeline-item"><span class="timeline-date">{{ item.entry_date|date:'d M' }}</span><div><strong>{{ item.vehicle.registration_number }}</strong><small>{{ item.quantity_litres }} litres</small></div></div>{% empty %}<div class="empty-state">No fuel records yet.</div>{% endfor %}</div></section>
+  </div>
+</div>
+{% endblock %}

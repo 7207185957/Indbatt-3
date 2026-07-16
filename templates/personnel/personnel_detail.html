@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ person.full_name }} - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Personnel Detail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ person.rank }} {{ person.full_name }}</h1>
+    <p class="subtitle">{{ person.army_number }} &middot; {{ person.company.name }}</p>
+  </div>
+  <div class="btn-row">
+    <a href="{% url 'personnel:list' %}" class="btn btn-outline">&larr; Back to list</a>
+    {% if can_edit %}<a href="{% url 'personnel:edit' person.pk %}" class="btn">Edit</a>{% endif %}
+  </div>
+</div>
+
+<div class="form-grid">
+  <div class="card">
+    <h2>Details</h2>
+    <ul class="kv-list">
+      <li><span class="k">Army / Service Number</span><span class="v">{{ person.army_number }}</span></li>
+      <li><span class="k">Rank</span><span class="v">{{ person.rank }}</span></li>
+      <li><span class="k">Full Name</span><span class="v">{{ person.full_name }}</span></li>
+      <li><span class="k">Company / Sub-unit</span><span class="v">{{ person.company.name }}</span></li>
+      <li><span class="k">Platoon</span><span class="v">{{ person.platoon|default:"-" }}</span></li>
+      <li><span class="k">Section</span><span class="v">{{ person.section|default:"-" }}</span></li>
+      <li><span class="k">Appointment / Trade</span><span class="v">{{ person.appointment|default:"-" }}</span></li>
+      <li><span class="k">Date of Joining Unit</span><span class="v">{{ person.date_of_joining_unit }}</span></li>
+      <li><span class="k">Status</span><span class="v"><span class="badge badge-{{ person.status_badge_class }}">{{ person.get_status_display }}</span></span></li>
+      <li><span class="k">Active</span><span class="v">{% if person.is_active %}Yes{% else %}No{% endif %}</span></li>
+      <li><span class="k">Remarks</span><span class="v">{{ person.remarks|default:"-" }}</span></li>
+    </ul>
+    <p class="help-text" style="margin-top:12px;">
+      Created by {{ person.created_by|default:"-" }} on {{ person.created_at|date:"d M Y H:i" }}.<br>
+      Last updated by {{ person.updated_by|default:"-" }} on {{ person.updated_at|date:"d M Y H:i" }}.
+    </p>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>Recent Leave / TD / Absence</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Type</th><th>From</th><th>To</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for a in absence_records %}
+            <tr>
+              <td><a href="{% url 'absence:detail' a.pk %}">{{ a.get_type_display }}</a></td>
+              <td>{{ a.from_date }}</td><td>{{ a.to_date }}</td>
+              <td><span class="badge badge-{{ a.status_badge_class }}">{{ a.get_status_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty-state">No absence records.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Recent Duty History</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Duty Type</th><th>Location/Post</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for d in duty_records %}
+            <tr>
+              <td>{{ d.duty_date }}</td>
+              <td><a href="{% url 'dutyroster:detail' d.pk %}">{{ d.duty_type }}</a></td>
+              <td>{{ d.duty_location }}</td>
+              <td><span class="badge badge-{{ d.status_badge_class }}">{{ d.get_status_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty-state">No duty history.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
