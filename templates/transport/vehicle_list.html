@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Vehicle Register - {{ UNIT_NAME }}{% endblock %}
+{% block page_title %}Vehicle Register{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Vehicle Register</h1><p class="subtitle">Administrative fleet records.</p></div>{% if is_super_admin_user %}<a href="{% url 'admin:transport_vehicle_add' %}" class="btn">+ Add Vehicle</a>{% endif %}</div>
+<form method="get" class="filter-bar"><div class="form-group"><label>Registration</label><input class="form-control" name="q" value="{{ request.GET.q }}"></div><div class="form-group"><label>Status</label><select class="form-select" name="status"><option value="">All</option><option value="SERVICEABLE">Serviceable</option><option value="UNSERVICEABLE">Unserviceable</option><option value="MAINTENANCE">Under maintenance</option></select></div><div class="form-group"><button class="btn btn-secondary">Filter</button></div></form>
+<div class="table-wrap"><table class="data-table"><thead><tr><th>Registration</th><th>Type</th><th>Make / Model</th><th>Year</th><th>Status</th><th>Location</th><th></th></tr></thead><tbody>{% for vehicle in vehicles %}<tr><td>{{ vehicle.registration_number }}</td><td>{{ vehicle.vehicle_type }}</td><td>{{ vehicle.make_model|default:'-' }}</td><td>{{ vehicle.year|default:'-' }}</td><td><span class="badge">{{ vehicle.get_status_display }}</span></td><td>{{ vehicle.location|default:'-' }}</td><td>{% if is_super_admin_user %}<a class="btn btn-outline btn-sm" href="{% url 'admin:transport_vehicle_change' vehicle.pk %}">Edit</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="7" class="empty-state">No vehicle records found.</td></tr>{% endfor %}</tbody></table></div>
+{% include 'partials/pagination.html' %}
+{% endblock %}
